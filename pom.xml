@@ -12,15 +12,16 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- TODO: Set Java version for compilation -->
     <!-- <maven.compiler.source>21</maven.compiler.source> -->
     <!-- <maven.compiler.target>21</maven.compiler.target> -->
   </properties>
 
   <dependencies>
-
-    <!-- TODO: Add MySQL Connector dependency for database connection -->
-
+      <dependency>
+          <groupId>com.mysql</groupId>
+          <artifactId>mysql-connector-j</artifactId>
+          <version>8.3.0</version>
+      </dependency>
   </dependencies>
 
 
