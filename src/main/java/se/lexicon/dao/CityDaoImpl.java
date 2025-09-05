@@ -87,7 +87,29 @@ public class CityDaoImpl implements CityDao {
 
     @Override
     public List<City> findByName(String name) {
-        return List.of();
+        String sql = "SELECT ID, Name, CountryCode, District, Population FROM city WHERE Name LIKE ?";
+        List<City> cities = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, "%" + name + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    cities.add(new City(
+                            rs.getInt("ID"),
+                            rs.getString("Name"),
+                            rs.getString("CountryCode"),
+                            rs.getString("District"),
+                            rs.getInt("Population")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cities;
     }
 
     @Override
