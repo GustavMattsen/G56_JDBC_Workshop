@@ -23,7 +23,7 @@ public class CityDaoImpl implements CityDao {
         try {
             Class.forName(DRIVER);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("❌ MySQL JDBC Driver not found!", e);
+            throw new RuntimeException("MySQL JDBC Driver not found!", e);
         }
     }
 
@@ -32,6 +32,10 @@ public class CityDaoImpl implements CityDao {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
+    /**
+     * Finds a city by its unique ID.
+     * Returns an Optional containing the City if found, or empty if not.
+     */
     @Override
     public Optional<City> findById(int id) {
         String sql = "SELECT ID, Name, CountryCode, District, Population FROM city WHERE ID = ?";
@@ -58,6 +62,10 @@ public class CityDaoImpl implements CityDao {
         return Optional.empty();
     }
 
+    /**
+     * Finds all cities that match a given country code.
+     * Returns a list of matching cities.
+     */
     @Override
     public List<City> findByCode(String code) {
         String sql = "SELECT ID, Name, CountryCode, District, Population FROM city WHERE CountryCode = ?";
@@ -85,6 +93,10 @@ public class CityDaoImpl implements CityDao {
         return cities;
     }
 
+    /**
+     * Finds all cities whose name contains the given string (case-insensitive).
+     * Returns a list of matching cities.
+     */
     @Override
     public List<City> findByName(String name) {
         String sql = "SELECT ID, Name, CountryCode, District, Population FROM city WHERE Name LIKE ?";
@@ -112,6 +124,10 @@ public class CityDaoImpl implements CityDao {
         return cities;
     }
 
+    /**
+     * Retrieves all cities from the database.
+     * Returns a list containing all cities.
+     */
     @Override
     public List<City> findAll() {
         String sql = "SELECT ID, Name, CountryCode, District, Population FROM city";
@@ -136,6 +152,10 @@ public class CityDaoImpl implements CityDao {
         return cities;
     }
 
+    /**
+     * Saves a new city to the database.
+     * Returns the saved City with its newly generated ID.
+     */
     @Override
     public City save(City city) {
         String sql = "INSERT INTO city (Name, CountryCode, District, Population) VALUES (?, ?, ?, ?)";
@@ -165,13 +185,48 @@ public class CityDaoImpl implements CityDao {
         return null;
     }
 
+    /**
+     * Updates an existing city in the database.
+     * Uses the city's ID to identify which record to update.
+     */
     @Override
     public void update(City city) {
+        String sql = "UPDATE city SET Name = ?, CountryCode = ?, District = ?, Population = ? WHERE ID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            stmt.setString(1, city.getName());
+            stmt.setString(2, city.getCountryCode());
+            stmt.setString(3, city.getDistrict());
+            stmt.setInt(4, city.getPopulation());
+            stmt.setInt(5, city.getId());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                System.out.println("Update failed, no rows affected. ID: " + city.getId());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Deletes a city from the database by its ID.
+     */
     @Override
     public void deleteById(int id) {
+        String sql = "DELETE FROM city WHERE ID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            stmt.setInt(1, id);
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                System.out.println("Delete failed, no rows affected. ID: " + id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
