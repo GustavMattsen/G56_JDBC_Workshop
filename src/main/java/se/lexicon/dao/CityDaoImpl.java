@@ -114,11 +114,54 @@ public class CityDaoImpl implements CityDao {
 
     @Override
     public List<City> findAll() {
-        return List.of();
+        String sql = "SELECT ID, Name, CountryCode, District, Population FROM city";
+        List<City> cities = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                City city = new City(
+                        rs.getInt("ID"),
+                        rs.getString("Name"),
+                        rs.getString("CountryCode"),
+                        rs.getString("District"),
+                        rs.getInt("Population")
+                );
+                cities.add(city);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cities;
     }
 
     @Override
     public City save(City city) {
+        String sql = "INSERT INTO city (Name, CountryCode, District, Population) VALUES (?, ?, ?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, city.getName());
+            stmt.setString(2, city.getCountryCode());
+            stmt.setString(3, city.getDistrict());
+            stmt.setInt(4, city.getPopulation());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                System.out.println("Insert failed, no rows affected.");
+                return null;
+            }
+
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    int newId = keys.getInt(1);
+                    return new City(newId, city.getName(), city.getCountryCode(), city.getDistrict(), city.getPopulation());
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

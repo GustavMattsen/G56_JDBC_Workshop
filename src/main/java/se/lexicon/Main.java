@@ -9,10 +9,16 @@ import java.util.Optional;
 
 public class Main {
     public static void main(String[] args) {
+
+        System.out.println("DB_URL: " + System.getenv("DB_URL"));
+        System.out.println("DB_USER: " + System.getenv("DB_USER"));
+        System.out.println("DB_PASSWORD: " + System.getenv("DB_PASSWORD"));
+        System.out.println("DB_DRIVER: " + System.getenv("DB_DRIVER"));
+        
         CityDao cityDao = new CityDaoImpl();
 
-        //Create a new city
-        City newCity = new City(0, "Testville", "SWE", "Test District", 12345);
+        //Create (save) a new city
+        City newCity = new City(0, "Testgränd", "SWE", "Testlän", 12345);
         City savedCity = cityDao.save(newCity);
         System.out.println("Saved City: " + savedCity);
 
@@ -25,5 +31,9 @@ public class Main {
         //Read (findByName)
         List<City> citiesByName = cityDao.findByName("Testville");
         System.out.println("Cities found by name: " + citiesByName);
+
+        //List (find) all cities
+        List<City> allCities = cityDao.findAll();
+        System.out.println("Total cities in database: " + allCities.size());
     }
 }
